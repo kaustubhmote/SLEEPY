@@ -1275,8 +1275,12 @@ class Rho():
         if detect:
             Op=Op.T.conj()
             # Op/=np.abs(np.trace(Op.T.conj()@Op))*self.expsys.Op.Mult.prod()/2
-            Op/=np.abs(np.trace(Op.T.conj()@Op))
+            if Op.ndim>1:
+                Op/=np.abs(np.trace(Op.T.conj()@Op))
+                
             if (self.L.Peq or (isinstance(self.rho0,str) and self.rho0=='Thermal')):Op*=self.expsys.Op.Mult.prod()/2
+            if Op.ndim==1 and Op.size==self.shape[0]:
+                return Op
             return np.tile(Op.reshape(Op.size),nHam)
         else:
             # Op/=np.abs(np.trace(Op.T.conj()@Op))
@@ -1365,7 +1369,8 @@ class Rho():
                     Nuc,a=self.parseOp(self.OpScaling(detect)[0])
                     mass=re.findall(r'\d+',Nuc)
                     if Nuc!='e-':
-                        Nuc=re.findall(r'[A-Z]',Nuc.upper())[0]
+                        # Nuc=re.findall(r'[A-Z]',Nuc.upper())[0]  #Why were we only taking the first element?
+                        Nuc=''.join(re.findall(r'[A-Z]',Nuc.upper()))
                     else:
                         Nuc='e'
                     x=(r'^{'+mass[0]+'}' if len(mass) else r'')+(Nuc if Nuc=='e' else Nuc.capitalize())

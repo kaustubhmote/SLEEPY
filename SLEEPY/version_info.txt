@@ -1,3 +1,21 @@
+VERSION 1.1.2
+SLEEPY 1.1.2 is a minor update from version 1.1.1
+    Corrected an error in Liouvillian.clear_cache, which was failing when
+    clearing systems in exchange if different numbers of interactions were
+    included in ExpSys objects (usually, we would always have the same number 
+    of interactions, but if we suppose an interaction strength goes to zero, 
+    one could in principle leave it away, but this approach was failing).
+    
+    Some figure displays with nuclear symbols having two characters were 
+    leaving away the second character (e.g. Li was displayed as L). This has
+    been corrected. 
+    
+    Support was added for defining the detection operator as a vector with 
+    a length equal to the total length of the Liouvillian. This allows one to
+    manually define a detection operator that only detects in a given state in
+    exchange (for example). Previously, some of the setup steps were creating 
+    errors due to the unexpected shape/size.
+ 
 VERSION 1.1.1
 SLEEPY 1.1.1 is a minor update to version 1.1.0:
     We correct the "tumbling" function in sl.Tools. The tumbling function
