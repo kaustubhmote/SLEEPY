@@ -158,7 +158,7 @@ class RelaxClass():
     
     def Lindblad(self,M,E):
         """
-        Provides the Lindblad thermalization matrix (I think) for matrix M and
+        Provides the Lindblad thermalization matrix for matrix M and
         frequencies, v. Ideally, M would be in the eigenbasis of the Hamiltonian,
         and v the appropriately sorted eigenfrequencies.
 
@@ -169,7 +169,7 @@ class RelaxClass():
         E : np.array
             Vector containing the energy (Joules) for each state of M. Note
             that this is NOT the diagonal of the Liouvillian, where alpha/beta
-            states have 0 energy.
+            states are zero.
 
         Returns
         -------
@@ -285,7 +285,7 @@ class RelaxClass():
         loop=[(k,H) for k,H in enumerate(L.H)] if state is None else [(state,L.H[state])]
         
         S=self.Op[i].S
-        if S>1:warn('Tilted frame relaxation may not behave as expected for S>1')
+        if S>1/2:warn('Tilted frame relaxation may not behave as expected for S>1/2')
         
         for k,H in loop:
             U,Ui,v=H.eig2L(step)

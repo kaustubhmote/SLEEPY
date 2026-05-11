@@ -218,9 +218,8 @@ def load_bruker_spec(location: str, opt: Union[Dict, List[float], None] = None):
             'WDW': out['WDW'], 'SSB': out['SSB'], 'GB': out['GB'], 'LB': out['LB'],
             'AQ': 1/(out['SW_p']*2*(out['FTSIZE']-1)/(out['STSI']-1))*(out['TDeff']-2),
             'SI': out['FTSIZE'], 'TD': out['TDeff'], 'SF': out['SF'], 'PHC1': out['PHC1'],
-            'SWH0': out['SW_p'] * (out['FTSIZE']-1)/out['STSI']
+            'SWH0': out['SW_p'] * (out['FTSIZE']-1)/out['STSI'],
         }
-
     # Load spectrum
     byte_order = '<' if get_param_bruker(os.path.join(folder, 'procs'), 'BYTORDP') == 0 else '>'
     data_path = os.path.join(folder, data_file)

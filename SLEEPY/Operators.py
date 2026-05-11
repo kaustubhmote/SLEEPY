@@ -45,11 +45,13 @@ def so_z(S=None):
 
 def so_alpha(S=None):
     "Calculates the alpha state for a single spin"
+    if S is None:S=1/2
     Sz=so_z(S)
     return np.eye(Sz.shape[0],dtype=Defaults['ctype']).astype(Defaults['ctype'])/2+Sz
 
 def so_beta(S=None):
     "Calculates the beta state for a single spin"
+    if S is None:S=1/2
     Sz=so_z(S)
     return np.eye(Sz.shape[0],dtype=Defaults['ctype']).astype(Defaults['ctype'])/2-Sz
 

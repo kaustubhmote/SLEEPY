@@ -1366,15 +1366,18 @@ class Rho():
                     a=detect[2:]
                     Nuc=''
                 else:
-                    Nuc,a=self.parseOp(self.OpScaling(detect)[0])
-                    mass=re.findall(r'\d+',Nuc)
-                    if Nuc!='e-':
-                        # Nuc=re.findall(r'[A-Z]',Nuc.upper())[0]  #Why were we only taking the first element?
-                        Nuc=''.join(re.findall(r'[A-Z]',Nuc.upper()))
-                    else:
-                        Nuc='e'
-                    x=(r'^{'+mass[0]+'}' if len(mass) else r'')+(Nuc if Nuc=='e' else Nuc.capitalize())
-                
+                    try:
+                        Nuc,a=self.parseOp(self.OpScaling(detect)[0])
+                        mass=re.findall(r'\d+',Nuc)
+                        if Nuc!='e-':
+                            # Nuc=re.findall(r'[A-Z]',Nuc.upper())[0]  #Why were we only taking the first element?
+                            Nuc=''.join(re.findall(r'[A-Z]',Nuc.upper()))
+                        else:
+                            Nuc='e'
+                        x=(r'^{'+mass[0]+'}' if len(mass) else r'')+(Nuc if Nuc=='e' else Nuc.capitalize())
+                    except:
+                        return detect
+                    
                 if a in ['x','y','z']:
                     a=r'_'+a
                 elif a in ['alpha','beta']:
