@@ -461,6 +461,7 @@ class PowderAvg():
             out.beta=self.beta[i]
             out.gamma=self.gamma[i]
             out.weight=self.weight[i]
+            out.weight/=out.weight.sum()
             return out
         
         out=copy(self)
@@ -673,7 +674,7 @@ class RotInter():
         if self._Afull is None or len(self._Afull)!=self.pwdavg.N:self.MOL2LAB_Afull()
         return self._Afull.copy()
     
-    def plot(self,n:int=0,avg=0,ax=None):
+    def plot(self,n:int=0,avg=0,ax=None,**kwargs):
         """
         Creates a 3D plot of the tensor stored in RotInter. By default, shows
         the magnitude of the n=0 term, although -2, -1, 0, 1, or 2 may be selected
@@ -717,9 +718,13 @@ class RotInter():
         y=l*np.sin(alpha)*np.sin(beta)*sc
         z=l*np.cos(beta)*sc
         
-        cmap=plt.get_cmap('hsv')
+        if 'cmap' in kwargs:
+            cmap=plt.get_cmap(kwargs.pop('cmap'))
+        else:
+            cmap=plt.get_cmap('hsv')
+            
         if n:
-            ax.scatter3D(x,y,z,c=cmap(np.arctan2(A.imag,A.real)/(2*np.pi)+0.5))
+            ax.scatter3D(x,y,z,c=cmap(np.arctan2(A.imag,A.real)/(2*np.pi)+0.5),**kwargs)
         else:
             i=(A+avg)>=0
             if np.any(i):

@@ -326,7 +326,7 @@ class ExpSys():
         return self
     
     @use_zoom
-    def plot_inter(self,i:int,n:int=0,ax=None):
+    def plot_inter(self,i:int,n:int=0,ax=None,**kwargs):
         """
         Creates 3D scatter plots representing the size of the z-component of the
         interaction as a function of orientation. Helpful in visualizing
@@ -371,7 +371,12 @@ class ExpSys():
             y=np.sin(alpha)*np.sin(beta)*A
             z=np.cos(beta)*A
             
-            ax.scatter3D(x,y,z,linewidth=0.2,antialiased=True,color='red' if A>0 else 'blue')
+            if 'color' in kwargs:
+                color=kwargs.pop('color')
+            else:
+                color='red' if A>0 else 'blue'
+            
+            ax.scatter3D(x,y,z,linewidth=0.2,antialiased=True,color=color,**kwargs)
             ax.set_box_aspect((1,1,1))
             ax.set_xlabel('Hz')
             ax.set_ylabel('Hz')
@@ -379,7 +384,7 @@ class ExpSys():
             ax.set_title(f'n={n}')
             return ax
             
-        H.Hinter[i].rotInter.plot(avg=H.Hinter[i].avg,n=n,ax=ax)
+        H.Hinter[i].rotInter.plot(avg=H.Hinter[i].avg,n=n,ax=ax,**kwargs)
         ax.set_title(f'n={n}')
         return ax
         
