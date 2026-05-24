@@ -15,6 +15,9 @@ SLEEPY 1.1.2 is a minor update from version 1.1.1
     manually define a detection operator that only detects in a given state in
     exchange (for example). Previously, some of the setup steps were creating 
     errors due to the unexpected shape/size.
+    
+    Added the ability to provide a list of indices or a boolean list to the
+    powder average to select a subset of angles.
  
 VERSION 1.1.1
 SLEEPY 1.1.1 is a minor update to version 1.1.0:
