@@ -570,7 +570,7 @@ def SetupTumbling(expsys,tc:float,q:int=3,returnL:bool=True,incl_alpha:bool=Fals
     Parameters
     ----------
     expsys : TYPE
-        SLEEPY expsys
+        SLEEPY expsys or Liouvillian that already contains motion
     tc : float
         DESCRIPTION.
     tc : float
@@ -619,6 +619,10 @@ def SetupTumbling(expsys,tc:float,q:int=3,returnL:bool=True,incl_alpha:bool=Fals
 
     """
     
+    if hasattr(expsys,'kex'):
+        return CombineMotion(expsys,'SetupTumbling',tc=tc,q=q,
+                             incl_alpha=incl_alpha,incl_gamma=incl_gamma,solid=solid,
+                             returnL=returnL)
     
     kex,euler=tumbling(tc=tc,q=q,incl_alpha=incl_alpha,incl_gamma=incl_gamma)
     
@@ -630,6 +634,7 @@ def SetupTumbling(expsys,tc:float,q:int=3,returnL:bool=True,incl_alpha:bool=Fals
         for H0 in H:
             if not(H0.isotropic):
                 kwargs=copy(H0.info)
+                kwargs['euler']=copy(kwargs['euler'])
                 if hasattr(kwargs['euler'][0],'__len__'):
                     kwargs['euler'].append(euler0)
                 else:
@@ -663,7 +668,7 @@ def SetupTetraHop(expsys,tc:float,n:int=4,returnL:bool=True):
     Parameters
     ----------
     expsys : TYPE
-        SLEEPY expsys
+        SLEEPY expsys or Liouvillian that already contains motion
     tc : float
         Desired correlation time of tumbling.
     n  : number of tetrahedral sites in exchange (2-4)
@@ -681,6 +686,9 @@ def SetupTetraHop(expsys,tc:float,n:int=4,returnL:bool=True):
     kex : np.array
         Exchange matrix
     """
+    
+    if hasattr(expsys,'kex'):
+        return CombineMotion(expsys,'SetupTetraHop',tc=tc,n=n,returnL=returnL)
             
     ex_list,kex=SetupTumbling(expsys, tc,q=1,returnL=False,solid=True)
     
@@ -700,10 +708,10 @@ def Setup3siteSym(expsys,tc:float,phi:float=np.arccos(-1/3),returnL:bool=True):
     Parameters
     ----------
     expsys : TYPE
-        SLEEPY expsys
+        SLEEPY expsys or Liouvillian that already contains motion
     tc : float
         Desired correlation time of tumbling.
-    phi : Desired opening angle of hopping
+    phi : Desired opening angle of hopping (radians)
     returnL : bool
         Flag to specify that the Liouvillian should be return directly
 
@@ -718,6 +726,10 @@ def Setup3siteSym(expsys,tc:float,phi:float=np.arccos(-1/3),returnL:bool=True):
     kex : np.array
         Exchange matrix
     """
+    
+    if hasattr(expsys,'kex'):
+        return CombineMotion(expsys,'Setup3siteSym',tc=tc,phi=phi,returnL=returnL)
+    
     ex_list,kex=SetupTetraHop(expsys,tc=tc,n=3,returnL=False)
     
     for ex in ex_list:
@@ -729,6 +741,142 @@ def Setup3siteSym(expsys,tc:float,phi:float=np.arccos(-1/3),returnL:bool=True):
         from .Liouvillian import Liouvillian
         return Liouvillian(ex_list,kex=kex)            
     return ex_list,kex
+
+def Setup2site(expsys,tc:float,p1:float=0.5,euler0=None,euler1=None,euler_d0=[0,0,0],euler_d1=[0,25,0],returnL:bool=True):
+    """
+    
+
+    Parameters
+    ----------
+    expsys : TYPE
+        Initial ExpSys or Liouvillian that already contains motion
+    tc : float
+        Correlation time of hopping.
+    p1 : float, optional
+        Population of state 1 (p2=1-p1). The default is 0.5.
+    euler0 : list-like, optional
+        3-element array with euler angles before hop in radians. 
+        The default is None.
+    euler1 : list-like, optional
+        3-element array with euler angles after hop in radians. 
+        The default is None.
+    euler_d0 : list-like, optional
+        3-element array with euler angles before hop in degrees. 
+        The default is [0,0,0].
+    euler_d1 : list-like, optional
+        3-element array with euler angles after hop in degrees. 
+        The default is [0,25,0].
+    returnL : bool, optional
+        Boolean to return Liouvillian or ex_list and kex. 
+        The default is True (returns Liouvillian)
+
+    Returns
+    -------
+    Liouvillian (if returnL=True)
+    
+    or
+    
+    ex_list : list
+        list of expsys
+    kex : np.array
+        Exchange matrix
+
+    """
+    
+    
+    if hasattr(expsys,'kex'):
+        return CombineMotion(expsys,'Setup2site',tc=tc,p1=p1,euler_d0=euler_d0,
+                             euler_d1=euler_d1,returnL=False)
+    
+    # Exchange matrix
+    kex=twoSite_kex(tc=tc,p1=p1)
+    
+    # Convert to radians
+    euler_0=[x*np.pi/180 for x in euler_d0]
+    euler_1=[x*np.pi/180 for x in euler_d1]
+
+
+    H=expsys.Hamiltonian()[0].Hinter    
+    ex_list=[]
+    for k,euler0 in enumerate([euler_0,euler_1]):
+        ex_list.append(expsys.copy())
+        for H0 in H:
+            if not(H0.isotropic):
+                kwargs=copy(H0.info)
+                kwargs['euler']=copy(kwargs['euler'])
+                if hasattr(kwargs['euler'][0],'__len__'):
+                    kwargs['euler'].append(euler0)
+                else:
+                    kwargs['euler']=[kwargs['euler'],euler0]
+                
+                ex_list[-1].set_inter(**kwargs)
+    
+                kwargs=copy(H0.info)
+                kwargs['euler']=copy(kwargs['euler'])
+                if hasattr(kwargs['euler'][0],'__len__'):
+                    kwargs['euler'].append(euler0)
+                else:
+                    kwargs['euler']=[kwargs['euler'],euler0]
+                    
+                ex_list[-1].set_inter(**kwargs)
+    
+    if returnL:
+        from .Liouvillian import Liouvillian
+        return Liouvillian(ex_list,kex=kex)            
+    return ex_list,kex
+
+def CombineMotion(L,Type:str,returnL:bool=True,**kwargs):
+    """
+    Given a Liouvillian, builds motion on top of motion already present in the
+    Liouvillian. Specify the existing Liouvillian, plus the name of the desired
+    function, and the required arguments for that function.
+    
+    Note that we normally do not use this function directly– we have built
+    it into the existing motional functions, where it will be applied 
+    automatically if a Liouvillian is provided instead of an ExpSys object.
+
+    Parameters
+    ----------
+    L : TYPE
+        DESCRIPTION.
+    Type : str
+        DESCRIPTION.
+    returnL : bool, optional
+        DESCRIPTION. The default is True.
+    **kwargs : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    Liouvillian (if returnL=True)
+    
+    else
+    
+    tuple, with list of expsys and kex matrix
+
+    """
+    
+    # Extract initial kex
+    N=len(L.H)
+    if L.kex.shape[0]<N:
+        kex0=np.zeros([N,N])
+    else:
+        kex0=L.kex
+
+    assert Type in globals(),f"Unknown motional function, '{Type}'"
+
+    ex=[]        
+    for H in L.H:
+        ex_list,kex=globals()[Type](expsys=H.expsys,**kwargs,returnL=False)
+        ex.extend(ex_list)
+        
+    kex=np.kron(kex0,np.eye(kex.shape[0]))+np.kron(np.eye(kex0.shape[0]),kex)
+    
+    if returnL:
+        from .Liouvillian import Liouvillian
+        return Liouvillian(ex,kex=kex)            
+    return ex,kex
+    
 
 def tumbling(tc:float,q:int=3,incl_alpha=False,incl_gamma=True):
     """

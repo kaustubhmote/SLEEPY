@@ -1,5 +1,15 @@
 VERSION 1.1.2
 SLEEPY 1.1.2 is a minor update from version 1.1.1
+    This version introduces the Combine motion functionality, which lets one
+    combine two or more motional models into a Liouvillian. One sets up the
+    first motional model in a Liouvillian as usual. Then, running one of the 
+    functions SetupTumbling, SetupTetraHop, Setup3SitSym, or Setup2site will
+    add that motion on top of any existing motion. Note that instead of 
+    providing ExpSys as argument to the setup program, provide the existing
+    Liouvillian. Otherwise, arguments remain the same. Note that the order
+    that motions are added can matter, due to the order that the euler angles
+    are introduced.
+
     Corrected an error in Liouvillian.clear_cache, which was failing when
     clearing systems in exchange if different numbers of interactions were
     included in ExpSys objects (usually, we would always have the same number 
