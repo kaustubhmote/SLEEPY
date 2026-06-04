@@ -786,7 +786,7 @@ def Setup2site(expsys,tc:float,p1:float=0.5,euler0=None,euler1=None,euler_d0=[0,
     
     if hasattr(expsys,'kex'):
         return CombineMotion(expsys,'Setup2site',tc=tc,p1=p1,euler_d0=euler_d0,
-                             euler_d1=euler_d1,returnL=False)
+                             euler_d1=euler_d1,returnL=returnL)
     
     # Exchange matrix
     kex=twoSite_kex(tc=tc,p1=p1)
