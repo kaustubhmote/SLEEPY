@@ -397,10 +397,7 @@ class RelaxClass():
         
         return Lrelax
         
-    
-<<<<<<< Updated upstream
-=======
-    
+
     
     # def RandomFieldSD(self,i:int,tc:list,A:list,Thermal:bool=False,state:int=None,step:int=None):
     #     """
@@ -528,8 +525,7 @@ class RelaxClass():
     #         Lrelax[k*n**2:(k+1)*n**2][:,k*n**2:(k+1)*n**2]=out
         
     #     return Lrelax    
-    
->>>>>>> Stashed changes
+
     def DynamicThermal(self,step:int=None):
         """
         Thermalizes dynamic processes.
